@@ -112,3 +112,65 @@ def cmd_reset(args):
     pid = mod.META["id"]
     path = storage.reset_workspace(pid, mod.STARTER)
     render.print_success(f"reset {path}")
+
+
+def cmd_update(_args=None):
+    """Pull the latest problem content from the upstream repo."""
+    from . import updater
+    from ..config import REPO_URL
+
+    if not updater.has_git():
+        render.print_error(
+            "git is not installed on this machine. Install git and try again."
+        )
+        return
+
+    if not updater.is_cloned():
+        render.print_info(f"first-time setup: cloning {REPO_URL}")
+        ok, msg = updater.clone()
+        if ok:
+            commit = updater.current_commit()
+            render.print_success(f"cloned to {updater.REPO_DIR}")
+            if commit:
+                render.print_info(f"at commit {commit}")
+        else:
+            render.print_error(f"clone failed:\n{msg}")
+        return
+
+    before = updater.current_commit()
+    render.print_info(f"pulling latest problems (current: {before})...")
+    ok, msg = updater.pull()
+    after = updater.current_commit()
+
+    if ok:
+        if before == after:
+            render.print_success(f"already up to date (at {after})")
+        else:
+            render.print_success(f"updated: {before} → {after}")
+    else:
+        render.print_error(f"pull failed:\n{msg}")
+        render.print_info(
+            "if this persists (e.g. local modifications or history divergence), "
+            "run: adscb sync"
+        )
+
+
+def cmd_sync(_args=None):
+    """Nuke and re-clone the content repo from scratch."""
+    from . import updater
+    from ..config import REPO_URL
+
+    if not updater.has_git():
+        render.print_error("git is not installed on this machine.")
+        return
+
+    if updater.is_cloned():
+        render.print_info(f"removing existing clone at {updater.REPO_DIR}")
+        updater.nuke()
+
+    render.print_info(f"cloning {REPO_URL}")
+    ok, msg = updater.clone()
+    if ok:
+        render.print_success(f"synced. at commit {updater.current_commit()}")
+    else:
+        render.print_error(f"clone failed:\n{msg}")

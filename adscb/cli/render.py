@@ -18,11 +18,23 @@ def print_status(problems, progress):
         1 for pid in problems
         if progress.get(pid, {}).get("attempts", 0) > 0 and not progress.get(pid, {}).get("solved")
     )
+
+    # Content version line — only shown if the clone exists
+    from . import updater
+    content_line = ""
+    if updater.is_cloned():
+        commit = updater.current_commit()
+        if commit:
+            content_line = f"\n[dim]content: {commit}  ({updater.current_branch() or 'unknown'})  —  adscb update to refresh[/]"
+    else:
+        content_line = "\n[dim]content: baseline (package only)  —  adscb update to enable live updates[/]"
+
     console.print()
     console.print(Panel(
         f"[bold cyan]ADSCB[/]  Algorithms & Data Structures for Computational Biology\n"
         f"[green]{solved}[/] solved   [yellow]{attempted}[/] in progress   "
-        f"[dim]{total - solved - attempted}[/] untouched   (total: {total})",
+        f"[dim]{total - solved - attempted}[/] untouched   (total: {total})"
+        f"{content_line}",
         border_style="cyan",
         box=box.ROUNDED,
     ))

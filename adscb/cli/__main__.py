@@ -37,6 +37,9 @@ def build_parser():
     p = sub.add_parser("reset", help="reset workspace file to the starter template")
     p.add_argument("problem_id")
 
+    sub.add_parser("update", help="pull latest problem content from upstream")
+    sub.add_parser("sync", help="wipe and re-clone the content repo")
+
     return parser
 
 
@@ -59,6 +62,8 @@ def main(argv=None):
         "hint": commands.cmd_hint,
         "solution": commands.cmd_solution,
         "reset": commands.cmd_reset,
+        "update": commands.cmd_update,
+        "sync": commands.cmd_sync,
     }
     handler = handlers[args.cmd]
     handler(args)

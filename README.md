@@ -24,14 +24,15 @@ Python 3.10 or newer is required. Pick whichever of these fits your setup.
 
 ### Option 1 — pipx (cleanest, recommended if you can)
 
-pipx installs CLI tools in isolated virtual environments so they don't pollute your system Python. If you already have pipx, just:
+pipx installs CLI tools in isolated virtual environments so they don't pollute your system Python. If you already have pipx, install directly from the GitHub repo:
 
 ```bash
-git clone https://github.com/mahmoudxyz/adscb.git
-cd adscb                  # the folder containing pyproject.toml
-pipx install .
+pipx install git+https://github.com/mahmoudxyz/adscb.git
+adscb update
 adscb list
 ```
+
+That's it — no cloning, no `cd`. The first `adscb update` pulls the live problem content into `~/.adscb/repo/`; from then on, `adscb update` fetches any new problems the instructor pushes.
 
 **If `pipx` is not found**, install it first:
 
@@ -52,14 +53,13 @@ python3 -m pipx ensurepath
 exec zsh
 ```
 
-Then run `cd adscb && pipx install .`. **The `exec zsh` (or `exec bash`) step matters** — `pipx ensurepath` adds `~/.local/bin` to your `PATH`, but the change only takes effect in a fresh shell.
+Then run `pipx install git+https://github.com/mahmoudxyz/adscb.git`. **The `exec zsh` (or `exec bash`) step matters** — `pipx ensurepath` adds `~/.local/bin` to your `PATH`, but the change only takes effect in a fresh shell.
 
 ### Option 2 — pip --user (shortest path, no isolation)
 
 If you don't want to deal with pipx at all:
 
 ```bash
-git clone https://github.com/mahmoudxyz/adscb.git
 cd adscb
 pip install --user .
 adscb list
@@ -85,7 +85,6 @@ On macOS with Homebrew Python the path may be `~/Library/Python/3.11/bin` (adjus
 Per-project isolation without pipx:
 
 ```bash
-git clone https://github.com/mahmoudxyz/adscb.git
 cd adscb
 python3 -m venv .venv
 source .venv/bin/activate
@@ -98,7 +97,6 @@ Downside: you need `source .venv/bin/activate` in each new terminal session befo
 ### Option 4 — no install at all (5-minute try-out)
 
 ```bash
-git clone https://github.com/mahmoudxyz/adscb.git
 cd adscb
 pip install --user rich       # the only runtime dependency
 python -m adscb.cli list
@@ -107,7 +105,17 @@ python -m adscb.cli start ch00/01_hello
 
 Works anywhere, nothing installed globally. Good for a quick test before you commit to an install method.
 
-### ## The primitives module
+### Troubleshooting
+
+**`zsh: command not found: adscb`** after installing with `pipx install .` → You didn't run `pipx ensurepath` + restart your shell. Do both and try again. `pipx ensurepath && exec zsh` should do it.
+
+**`zsh: command not found: pipx`** → pipx isn't installed. See Option 1 above.
+
+**`error: externally-managed-environment`** on `pip install --user .` (newer Debian/Ubuntu) → Either use pipx (Option 1) or add `--break-system-packages` to the pip command. pipx is the cleaner fix.
+
+**Everything else** → try `python -m adscb.cli list`. If that works, it's a PATH issue with the `adscb` command. If it doesn't, it's an install issue — the error message will tell you which.
+
+## The primitives module
 
 ```python
 from adscb.primitives import Array, SLList, DLList, Stack, Queue, CircularQueue, NIL
@@ -142,7 +150,41 @@ adscb test     <problem_id>       run tests on your solution
 adscb hint     <problem_id>       reveal the next hint
 adscb solution <problem_id>       show the reference (after solving)
 adscb reset    <problem_id>       reset workspace file to the starter template
+adscb update                      pull latest problem content from upstream
+adscb sync                        wipe and re-clone the content repo
 ```
+
+## Staying up to date
+
+The instructor may push new problems, bug fixes, or tweak test cases
+after you've installed `adscb`. To pick up those changes:
+
+```bash
+adscb update
+```
+
+This performs a `git pull` inside `~/.adscb/repo/` (the local clone of
+the upstream repo). It's fast (a few KB over the wire) and safe — your
+workspace files under `~/.adscb/workspace/` and your progress are never
+touched. If the pull fails for some reason (history diverged, local
+modifications to the clone, anything weird), run:
+
+```bash
+adscb sync
+```
+
+which wipes `~/.adscb/repo/` and clones fresh. Again, your solutions
+and progress are untouched.
+
+**How the override works:** problems in `~/.adscb/repo/adscb/problems/`
+take precedence over the ones shipped inside the installed package.
+The first time you run `adscb update`, the clone appears and the
+overrides kick in. Until then, you're on the package baseline (the
+version frozen at install time). The status panel shows which mode
+you're in:
+
+    content: 19fa764  (main)  — adscb update to refresh     ← live clone
+    content: baseline (package only)  — adscb update to ... ← no clone yet
 
 ## Current problem set
 
@@ -210,15 +252,16 @@ The CLI auto-discovers problems on every launch. Add a file, save, and it shows 
 
 ## Data locations
 
-Your workspace files and progress live under `~/.adscb/`:
+Your workspace files, progress, and live problem clone all live under `~/.adscb/`:
 
 ```
 ~/.adscb/
   workspace/          # your solution files, one per problem
   progress.json       # which problems are solved, attempts, hints revealed
+  repo/               # live git clone of the upstream repo (managed by adscb update)
 ```
 
-You can edit the workspace files directly in any editor — `adscb edit` is just a shortcut. You can also delete `progress.json` any time to start fresh. The primitives package and problem definitions are not stored here; they live in the installed package.
+You can edit the workspace files directly in any editor — `adscb edit` is just a shortcut. You can also delete `progress.json` any time to start fresh. Deleting `repo/` is fine too — `adscb update` will clone it again. Only the `workspace/` directory contains work you actually care about; everything else is regenerable.
 
 ## Roadmap
 
@@ -226,7 +269,7 @@ You can edit the workspace files directly in any editor — `adscb edit` is just
 - Quiz-type problems (complexity answers, not just code)
 - `adscb visualize` — step through student code on small inputs and show the list/stack state at each step as ASCII
 - `adscb exam` — timed random selection of N problems from a chapter range
-- Auto-sync: `git pull` on launch if the package is a git clone, so problem fixes ship without reinstall
+- Optional silent auto-pull on launch (the plumbing is all there; it would be a one-line addition to the status command)
 
 ## License
 
