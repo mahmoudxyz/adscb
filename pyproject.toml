@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adscb"
+version = "0.1.0"
+description = "Algorithms & Data Structures for Computational Biology — terminal practice tool"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "rich>=13.0",
+]
+
+[project.scripts]
+adscb = "adscb.cli.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["adscb*"]
