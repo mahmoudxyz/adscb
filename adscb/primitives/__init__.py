@@ -20,7 +20,13 @@ from .sllist import SLList
 from .dllist import DLList
 from .stack import Stack
 from .queue import CircularQueue, Queue
+from .bintree import BinTree
+from .bst import BST
+from .gentree import GenTree
 
 NIL = None
 
-__all__ = ["Array", "SLList", "DLList", "Stack", "Queue", "CircularQueue", "NIL"]
+__all__ = [
+    "Array", "SLList", "DLList", "Stack", "Queue", "CircularQueue",
+    "BinTree", "BST", "GenTree", "NIL",
+]
