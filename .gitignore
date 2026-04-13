@@ -46,3 +46,8 @@ Thumbs.db
 # Zipped artifacts from building releases
 adscb.zip
 *.tar.gz
+
+# AI
+CLAUDE.md
+behavioral_guidelines.md
+lecs/
