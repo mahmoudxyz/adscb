@@ -23,10 +23,11 @@ from .queue import CircularQueue, Queue
 from .bintree import BinTree
 from .bst import BST
 from .gentree import GenTree
+from .hashtable import HashTable, DELETED
 
 NIL = None
 
 __all__ = [
     "Array", "SLList", "DLList", "Stack", "Queue", "CircularQueue",
-    "BinTree", "BST", "GenTree", "NIL",
+    "BinTree", "BST", "GenTree", "HashTable", "DELETED", "NIL",
 ]

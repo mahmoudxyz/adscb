@@ -118,7 +118,7 @@ Works anywhere, nothing installed globally. Good for a quick test before you com
 ## The primitives module
 
 ```python
-from adscb.primitives import Array, SLList, DLList, Stack, Queue, CircularQueue, NIL
+from adscb.primitives import Array, SLList, DLList, Stack, Queue, CircularQueue, HashTable, DELETED, NIL
 ```
 
 - **`Array(n)`** — 1-indexed fixed-size array. `A[0]` and `A[n+1]` raise `IndexError`. Tracks `.ops` for empirical complexity analysis.
@@ -126,6 +126,8 @@ from adscb.primitives import Array, SLList, DLList, Stack, Queue, CircularQueue,
 - **`DLList`** — doubly linked. Same pattern plus `.prev`.
 - **`Stack`** — fixed capacity. `.top` is an integer index (0 means empty, matching the slides). `S.peek()` reads the top value without popping (equivalent to `top(S)` in pseudocode).
 - **`CircularQueue`** (aliased as `Queue`) — circular-buffer queue with `.head`, `.tail`, `.size`, `.length`.
+- **`HashTable(m, strategy)`** — hash table with configurable collision resolution (`"chaining"`, `"linear"`, `"quadratic"`, `"double"`). Methods: `.insert(k, data)`, `.search(k)`, `.delete(k)`, `.load_factor()`. Tracks `.ops` for empirical complexity analysis.
+- **`DELETED`** — sentinel for open-addressing deleted slots (matching slides). Search skips it; insert reuses it.
 - **`NIL = None`** — so you can write `if x == NIL` just like the slides.
 
 Every primitive has an `.ops` counter so you can empirically check complexity:
@@ -189,12 +191,25 @@ you're in:
 ## Current problem set
 
 - **Chapter 0 — Intro** (1): `01_hello` — learn the workflow with a 2-line warmup.
+- **Chapter 3 — Sorting Algorithms** (13):
+  - `01`–`08` — implement every algorithm from the lecture: SelectionSort, InsertionSort, the Merge step, MergeSort, the Partition step, QuickSort, CountingSort, RadixSort.
+  - `10`–`12` — slide exercises: Top-k largest elements, QuickSelect (k-th smallest in O(n) average), sort a partially sorted array (merge tail into sorted prefix).
+  - `20`–`22` — invented practice: Count inversions via MergeSort, Dutch National Flag 3-way partition, Sort by frequency.
 - **Chapter 4 — Elementary Data Structures** (19):
   - `01`–`10` — the full exercise set from the lecture notes PDF (recursive search, recursive delete, recursive tail_insert, count occurrences, remove even, delete-and-duplicate, DLList insertion sort, stack/queue simulation, stack with O(1) min, recursive merge of sorted stacks).
   - `20`–`22` — build-it-yourself: implement SLList ops from raw Nodes, implement a `Stack` class from an Array, implement `CircularQueue` from scratch. Do these if you want to really feel the pointers.
   - `30`–`35` — classic problems: reverse SLList iteratively and recursively, find the middle node with two pointers, balanced parentheses, postfix expression evaluation, queue from two stacks.
+- **Chapter 5 — Trees** (18):
+  - `01`–`06` — binary tree and general tree operations: remove leaves, sum of leaves, prune left duplicates, tree height, count even nodes (GenTree), path sum (GenTree).
+  - `10`–`15` — BST operations: search, insert, min/max/predecessor/successor, delete, in/pre/post-order traversals, BFS level-order traversal.
+  - `20`–`25` — classic problems: is full binary tree, is valid BST, count nodes at depth, mirror tree, lowest common ancestor, build BinTree with ops counter.
+- **Chapter 9 — Hash Tables** (9):
+  - `01`–`03` — hash functions: division method, multiplication method, Horner's hash for strings.
+  - `04` — chaining: insert and search on a hash table with separate chaining.
+  - `05`–`07` — open addressing: linear probing simulation, double hashing simulation, insert/search/delete with DELETED marker.
+  - `08`–`09` — invented classics: first non-repeating character, two sum.
 
-More chapters coming: sorting, recurrences, trees, graphs, dynamic programming, alignment, BWT.
+More chapters coming: recurrences, graphs, dynamic programming, alignment, BWT.
 
 ## Authoring problems
 
@@ -265,7 +280,7 @@ You can edit the workspace files directly in any editor — `adscb edit` is just
 
 ## Roadmap
 
-- More chapters: sorting (next), recurrences, trees, graphs, DP, alignment, BWT
+- More chapters: recurrences, graphs, DP, alignment, BWT
 - Quiz-type problems (complexity answers, not just code)
 - `adscb visualize` — step through student code on small inputs and show the list/stack state at each step as ASCII
 - `adscb exam` — timed random selection of N problems from a chapter range
