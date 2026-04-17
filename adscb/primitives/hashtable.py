@@ -115,7 +115,7 @@ class HashTable:
         while curr is not None:
             self.ops += 1
             if curr.key == k:
-                curr.data = data
+                self._set_entry_data(idx, k, data)
                 return True
             curr = curr.next
         # head insert

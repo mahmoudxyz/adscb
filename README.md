@@ -208,8 +208,13 @@ you're in:
   - `04` — chaining: insert and search on a hash table with separate chaining.
   - `05`–`07` — open addressing: linear probing simulation, double hashing simulation, insert/search/delete with DELETED marker.
   - `08`–`09` — invented classics: first non-repeating character, two sum.
+- **Chapter 10 — Algorithmic Techniques** (14):
+  - `01`–`03` — Maximum Sum Subarray: brute force Θ(n²), divide & conquer Θ(n log n), Kadane's DP/greedy Θ(n).
+  - `04`–`05` — Change Making: bottom-up DP O(nW), greedy O(n) (canonical coin systems).
+  - `10`–`13` — slide exercises: duplicates in sorted array (D&C), is-sorted (D&C), fixed point in sorted distinct array (D&C, Θ(log n)), LCS length (DP, Θ(mn)).
+  - `20`–`24` — invented practice: Fibonacci bottom-up DP, House Robber (max sum no adjacent), Longest Increasing Subsequence, Activity Selection (greedy), Minimum Jumps to reach end (greedy).
 
-More chapters coming: recurrences, graphs, dynamic programming, alignment, BWT.
+More chapters coming: graphs, sequence alignment, BWT.
 
 ## Authoring problems
 
